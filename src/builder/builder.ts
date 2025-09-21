@@ -23,7 +23,7 @@ async function runner(input: InputOption, limit: string) {
     plugins: [
       overwriterPlugin,
       await lightningCSSPlugin({ options: { minify: true } }),
-      // experimentalPurgeCSSPlugin({}),
+      experimentalPurgeCSSPlugin({}),
       sharpPlugin({ limit }),
       reporterPlugin({ inputDir: CROSSCODE_DIR })
     ],

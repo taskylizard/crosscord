@@ -1,5 +1,7 @@
 import { PurgeCSS, type UserDefinedOptions } from 'purgecss'
 import type { EmittedAsset, OutputChunk, OutputOptions } from 'rolldown'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 export function experimentalPurgeCSSPlugin(
   options: Partial<UserDefinedOptions>
@@ -20,9 +22,12 @@ export function experimentalPurgeCSSPlugin(
         return
       }
       for (const file of cssFiles) {
+        // Read server.ts content to include HTML template in purging analysis
+        const serverContent = readFileSync(join(process.cwd(), 'src/server.ts'), 'utf-8')
+        
         const purged = await new PurgeCSS().purge({
           content: [{
-            raw: _html + ' ' + Object.entries(bundle).map(([_, v]) => {
+            raw: _html + ' ' + serverContent + ' ' + Object.entries(bundle).map(([_, v]) => {
               return (v as OutputChunk).code
             }).join('; '),
             extension: 'html'

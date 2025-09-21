@@ -19,7 +19,8 @@
   "excludes": [
     "**/node_modules",
     "**/*-lock.json",
-    "**/bun.lock"
+    "**/bun.lock",
+    "ccloader3"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.95.10.wasm",
