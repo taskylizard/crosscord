@@ -6,7 +6,7 @@
 3. Create a new app in the discord developer portal. Copy the client ID and client secret from the developer portal in the OAuth2 section, and put them in `.env` as `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` respectively.
 4. Now, in two terminals, run `bun run start` and `bun run tunnel` to start the server and tunnel it to cloudflared.
 5. Copy the URL that cloudflared gives you.
-6. Create a new app in the discord developer portal, and you want to set the following:
+6. Back in the discord developer portal, set the following:
    - OAuth2 > Redirect URIs: `https://127.0.0.1`
    - Activities > Settings > Enable Activities: Toggle it on
    - Activities > URL Mappings > Set Root Mapping to your cloudflared URL. Create a new proxy path mapping to `/{assets}/` to target to `<your cloudflared url>/{assets}/`.
