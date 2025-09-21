@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "format": "dprint fmt",
-    "compile": "bun run src/compile.ts",
+    "compile": "bun run src/builder/index.ts -c -p -l 10",
     "dev": "PORT=8765 bun --watch run -e .env src/server.ts",
     "start": "NODE_ENV=production PORT=8765 bun run -e .env src/server.ts",
     "tunnel": "cloudflared tunnel --url http://localhost:8765"

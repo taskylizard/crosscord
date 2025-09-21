@@ -1,7 +1,7 @@
 import { stat } from 'node:fs/promises'
 import { relative } from 'node:path'
 import type { Plugin } from 'rolldown'
-import { formatBytes, generateColor, noop, output } from './utils'
+import { formatBytes, generateColor, log, noop, output } from './utils'
 
 export interface ReporterOptions {
   inputDir?: string
@@ -79,6 +79,8 @@ export function reporterPlugin(options: ReporterOptions = {}): Plugin {
           '\x1b[1m' // bold text
         )
       }
+
+      log('js & css optimization complete!')
     }
   }
 }

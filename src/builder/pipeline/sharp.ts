@@ -9,7 +9,7 @@ import {
   l,
   log,
   output
-} from './utils'
+} from '../utils'
 
 export const sharpPlugin = (options: { limit: string }) => ({
   name: 'sharp',

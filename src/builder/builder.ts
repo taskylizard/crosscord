@@ -1,11 +1,11 @@
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { InputOption, rolldown } from 'rolldown'
-import { lightningCSSPlugin } from './lightningcss'
 import { overwriterPlugin } from './overwriter'
-import { experimentalPurgeCSSPlugin } from './purgecss.experimental'
+import { lightningCSSPlugin } from './pipeline/lightningcss'
+import { experimentalPurgeCSSPlugin } from './pipeline/purgecss.experimental'
+import { sharpPlugin } from './pipeline/sharp'
 import { reporterPlugin } from './reporter'
-import { sharpPlugin } from './sharp'
 import { CROSSCODE_DIR, entry, log, noop } from './utils'
 
 export async function runBuilder(limit: string) {
@@ -23,7 +23,7 @@ async function runner(input: InputOption, limit: string) {
     plugins: [
       overwriterPlugin,
       await lightningCSSPlugin({ options: { minify: true } }),
-      experimentalPurgeCSSPlugin({}),
+      // experimentalPurgeCSSPlugin({}),
       sharpPlugin({ limit }),
       reporterPlugin({ inputDir: CROSSCODE_DIR })
     ],
