@@ -14,14 +14,19 @@
   "dependencies": {
     "@discord/embedded-app-sdk": "^2.4.0",
     "hono": "^4.9.8",
+    "lightningcss": "^1.30.1",
     "oxc-minify": "^0.90.0",
     "p-limit": "^7.1.1",
-    "rolldown": "^1.0.0-beta.38"
+    "purgecss": "^7.0.2",
+    "rolldown": "^1.0.0-beta.38",
+    "sharp": "^0.34.4",
+    "tinyglobby": "^0.2.15"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
     "@types/bun": "^1.2.22",
     "dprint": "^0.50.2",
-    "typescript": "~5.8.0"
+    "typescript": "~5.8.0",
+    "unplugin-lightningcss": "^0.4.3"
   }
 }
