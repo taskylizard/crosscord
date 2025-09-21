@@ -1,0 +1,27 @@
+{
+  "name": "crosscord",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "format": "dprint fmt",
+    "compile": "bun run src/compile.ts",
+    "dev": "PORT=8765 bun --watch run -e .env src/server.ts",
+    "start": "NODE_ENV=production PORT=8765 bun run -e .env src/server.ts",
+    "tunnel": "cloudflared tunnel --url http://localhost:8765"
+  },
+  "author": "taskylizard",
+  "license": "MIT",
+  "dependencies": {
+    "@discord/embedded-app-sdk": "^2.4.0",
+    "hono": "^4.9.8",
+    "oxc-minify": "^0.90.0",
+    "p-limit": "^7.1.1",
+    "rolldown": "^1.0.0-beta.38"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.2",
+    "@types/bun": "^1.2.22",
+    "dprint": "^0.50.2",
+    "typescript": "~5.8.0"
+  }
+}
