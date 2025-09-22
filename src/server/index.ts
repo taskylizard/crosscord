@@ -118,10 +118,11 @@ app.get('/', (c) => {
   `)
 })
 
+const root = Bun.fileURLToPath(new URL('../../compiled', import.meta.url))
 app.use(
   '/*',
   serveStatic({
-    root: './compiled/'
+    root
   })
 )
 

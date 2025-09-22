@@ -1,19 +1,14 @@
-import { type Ansis, blue, rgb, yellow } from 'ansis'
+import { type Ansis, blue, rgb } from 'ansis'
 import { Stats } from 'node:fs'
-import { access, cp, readdir, rm, stat } from 'node:fs/promises'
-import {
-  dirname,
-  extname,
-  join,
-  normalize,
-  relative,
-  resolve,
-  sep
-} from 'node:path'
+import { access, cp, rm, stat } from 'node:fs/promises'
+import { dirname, extname, normalize, relative, resolve, sep } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import pLimit from 'p-limit'
-import type { InputOption, InternalModuleFormat } from 'rolldown'
+import type { InputOption } from 'rolldown'
 import { glob } from 'tinyglobby'
-export const CROSSCODE_DIR = './compiled'
+export const CROSSCODE_DIR = fileURLToPath(
+  new URL('../../compiled', import.meta.url)
+)
 export const JS_EXTENSIONS = ['.js']
 export const AUDIO_EXTENSIONS = ['.ogg']
 export const IMAGE_EXTENSIONS = ['.png']
@@ -29,33 +24,13 @@ export const output = (
   prefixColor = '\x1b[35m',
   msgColor = '\x1b[32m'
 ) => console.log(`${prefixColor}::${reset} ${msgColor}${message}${reset}`)
-export async function search(dir: string, extensions: string[]) {
-  const files: string[] = []
 
-  async function traverse(currentDir: string) {
-    const entries = await readdir(currentDir, { withFileTypes: true })
-
-    for (const entry of entries) {
-      const fullPath = join(currentDir, entry.name)
-
-      if (entry.isDirectory()) {
-        await traverse(fullPath)
-      } else if (entry.isFile() && extensions.includes(extname(entry.name))) {
-        files.push(fullPath)
-      }
-    }
-  }
-
-  await traverse(dir)
-  return files
-}
 // Copied from tsdown - MIT License
 export function formatBytes(bytes: number): string | undefined {
   if (bytes === Infinity) return undefined
   return `${(bytes / 1000).toFixed(2)} kB`
 }
 export const noop = <T>(v: T): T => v
-
 // Copied from https://github.com/rolldown/tsdown/blob/f0e67ebc9aad94b5e1702d4a1eeb9c5332bd15ea/src/utils/logger.ts
 // Copied from https://github.com/antfu/vscode-pnpm-catalog-lens - MIT License
 const colors = new Map<string, Ansis>()
@@ -79,7 +54,6 @@ export function generateColor(name: string = 'default'): Ansis {
   colors.set(name, color)
   return color
 }
-
 function hslToRgb(
   h: number,
   s: number,
@@ -107,7 +81,6 @@ function hslToRgb(
     Math.max(0, Math.round(b * 255))
   ]
 }
-
 function hue2rgb(p: number, q: number, t: number) {
   if (t < 0) t += 1
   if (t > 1) t -= 1
@@ -120,32 +93,17 @@ function hue2rgb(p: number, q: number, t: number) {
 export async function entry(
   entry: InputOption,
   cwd: string
-): Promise<Record<string, string>> {
-  const entryMap = await toObjectEntry(entry, cwd)
-  const entries = Object.values(entryMap)
-  if (entries.length === 0) {
-    throw new Error(`Cannot find entry: ${JSON.stringify(entry)}`)
-  }
-  return entryMap
-}
+): Promise<string[]> {
+  if (typeof entry === 'string') entry = [entry]
+  if (!Array.isArray(entry)) entry = Object.values(entry)
 
-export async function toObjectEntry(
-  entry: string | string[] | Record<string, string>,
-  cwd: string
-): Promise<Record<string, string>> {
-  if (typeof entry === 'string') {
-    entry = [entry]
-  }
-  if (!Array.isArray(entry)) {
-    return entry
-  }
+  const resolved = (await glob(entry, { cwd, expandDirectories: false })).map(
+    (file) => resolve(cwd, file)
+  )
 
-  const resolvedEntry = (
-    await glob(entry, { cwd, expandDirectories: false })
-  ).map((file) => resolve(cwd, file))
-  const base = lowestCommonAncestor(...resolvedEntry)
-  return Object.fromEntries(
-    resolvedEntry.map((file) => {
+  const base = resolved.length ? lowestCommonAncestor(...resolved) : cwd
+  const ordered = Object.fromEntries(
+    resolved.map(file => {
       const _relative = relative(base, file)
       return [
         _relative.slice(0, _relative.length - extname(_relative).length),
@@ -153,6 +111,8 @@ export async function toObjectEntry(
       ]
     })
   )
+
+  return Object.values(ordered)
 }
 
 export function fsExists(path: string): Promise<boolean> {

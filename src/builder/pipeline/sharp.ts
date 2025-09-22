@@ -11,65 +11,61 @@ import {
   output
 } from '../utils'
 
-export const sharpPlugin = (options: { limit: string }) => ({
-  name: 'sharp',
-  buildEnd: async () => {
-    const imageFiles = await entry(
-      ['**/*.png', '**/*.jpg', '**/*.jpeg'],
-      CROSSCODE_DIR
-    )
-    const files = Object.values(imageFiles)
-    log(
-      `found ${files.length} image files to optimize, will run in parallel with ${options.limit} workers...`
-    )
+export const image = async (options: { limit: string }) => {
+  const files = await entry(
+    ['**/*.png', '**/*.jpg', '**/*.jpeg'],
+    CROSSCODE_DIR
+  )
+  log(
+    `found ${files.length} image files to optimize, will run in parallel with ${options.limit} workers...`
+  )
 
-    const optimizePromises = files.map(async (file) =>
-      l(Number(options.limit))(() => optimizeImage(file))
-    )
-    const results = await Promise.all(optimizePromises)
+  const optimizePromises = files.map(async (file) =>
+    l(Number(options.limit))(() => optimizeImage(file))
+  )
+  const results = await Promise.all(optimizePromises)
 
-    let totalOriginal = 0
-    let totalOptimized = 0
+  let totalOriginal = 0
+  let totalOptimized = 0
 
-    for (const result of results) {
-      if (result) {
-        const { originalSize, newSize, relativePath } = result
-        totalOriginal += originalSize
-        totalOptimized += newSize
+  for (const result of results) {
+    if (result) {
+      const { originalSize, newSize, relativePath } = result
+      totalOriginal += originalSize
+      totalOptimized += newSize
 
-        const reduction = ((originalSize - newSize) / originalSize) * 100
-        const color = generateColor(relativePath)
-        const sign = reduction >= 0 ? '-' : '+'
-        const formattedReduction = Math.abs(reduction).toFixed(1)
-
-        output(
-          `${color(relativePath)}: ${formatBytes(originalSize)} → ${
-            formatBytes(newSize)
-          } (${sign}${formattedReduction}%)`,
-          '\x1b[34m', // blue prefix
-          '\x1b[37m' // white text
-        )
-      }
-    }
-
-    if (totalOriginal > 0) {
-      const totalReduction =
-        ((totalOriginal - totalOptimized) / totalOriginal) * 100
-      const sign = totalReduction >= 0 ? '-' : '+'
-      const formattedTotalReduction = Math.abs(totalReduction).toFixed(1)
+      const reduction = ((originalSize - newSize) / originalSize) * 100
+      const color = generateColor(relativePath)
+      const sign = reduction >= 0 ? '-' : '+'
+      const formattedReduction = Math.abs(reduction).toFixed(1)
 
       output(
-        `Total: ${formatBytes(totalOriginal)} → ${
-          formatBytes(totalOptimized)
-        } (${sign}${formattedTotalReduction}%)`,
-        '\x1b[33m', // yellow prefix
-        '\x1b[1m' // bold text
+        `${color(relativePath)}: ${formatBytes(originalSize)} → ${
+          formatBytes(newSize)
+        } (${sign}${formattedReduction}%)`,
+        '\x1b[34m', // blue prefix
+        '\x1b[37m' // white text
       )
     }
-
-    log('image optimization complete!')
   }
-})
+
+  if (totalOriginal > 0) {
+    const totalReduction = ((totalOriginal - totalOptimized) / totalOriginal) *
+      100
+    const sign = totalReduction >= 0 ? '-' : '+'
+    const formattedTotalReduction = Math.abs(totalReduction).toFixed(1)
+
+    output(
+      `Total: ${formatBytes(totalOriginal)} → ${
+        formatBytes(totalOptimized)
+      } (${sign}${formattedTotalReduction}%)`,
+      '\x1b[33m', // yellow prefix
+      '\x1b[1m' // bold text
+    )
+  }
+
+  log('image optimization complete!')
+}
 
 async function optimizeImage(filePath: string) {
   try {
