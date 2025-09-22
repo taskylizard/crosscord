@@ -81,11 +81,11 @@ async function optimizeImage(filePath: string) {
     let optimizedBuffer: Buffer
     if (ext === 'png') {
       optimizedBuffer = await sharp(filePath)
-        .png({ compressionLevel: 9, quality: 80 })
+        .png({ compressionLevel: 9, quality: 60 })
         .toBuffer()
     } else if (ext === 'jpg' || ext === 'jpeg') {
       optimizedBuffer = await sharp(filePath)
-        .jpeg({ quality: 80 })
+        .jpeg({ quality: 60 })
         .toBuffer()
     } else {
       // Skip unsupported formats

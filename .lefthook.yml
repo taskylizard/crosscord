@@ -1,7 +1,14 @@
 pre-commit:
   parallel: true
   jobs:
-    - run: bun format {staged_files}
+    - name: format
+      run: bun run format {staged_files}
       glob: "*.{js,ts,jsx,tsx,json,md,mdx,css,html,vue,yaml,toml,astro}"
       exclude: "bun.lock"
       stage_fixed: true
+
+    - name: lint
+      run: bun run lint
+
+    - name: typecheck
+      run: bun run typecheck

@@ -121,8 +121,7 @@ app.get('/', (c) => {
 app.use(
   '/*',
   serveStatic({
-    root: './compiled/',
-    onFound: (path, c) => {}
+    root: './compiled/'
   })
 )
 

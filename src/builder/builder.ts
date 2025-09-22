@@ -1,6 +1,9 @@
 import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
-import { InputOption, rolldown } from 'rolldown'
+import { fileURLToPath } from 'node:url'
+import { type InputOption, rolldown } from 'rolldown'
+import { copyCCLoader3RuntimeCCMod } from './ccloader3'
+import { copyPlugin } from './copy'
 import { overwriterPlugin } from './overwriter'
 import { lightningCSSPlugin } from './pipeline/lightningcss'
 import { experimentalPurgeCSSPlugin } from './pipeline/purgecss.experimental'
@@ -12,7 +15,7 @@ export async function runBuilder(limit: string) {
   await rm(join(CROSSCODE_DIR, 'modules'), {
     recursive: true
   })
-  const input = await entry(['**/*.js', '**/*.css', '**/*.png'], CROSSCODE_DIR)
+  const input = await entry(['**/*.js', '**/*.css'], CROSSCODE_DIR)
   log(`found ${Object.keys(input).length} files to bundle...`)
   return await runner(input, limit)
 }
@@ -39,10 +42,13 @@ async function runner(input: InputOption, limit: string) {
 
   await builder.write({
     minify: true,
+    dir: CROSSCODE_DIR,
     preserveModules: true,
     preserveModulesRoot: 'compiled',
     entryFileNames: '[name].js',
-    assetFileNames: '[name][extname]'
+    assetFileNames: 'assets/[name][extname]'
   })
   await builder.close()
+  await copyCCLoader3RuntimeCCMod()
+  return
 }
